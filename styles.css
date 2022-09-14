@@ -11,6 +11,7 @@ main {
     text-align: center;
     max-width: 300px;
     margin: 0 auto;
+    border: 2px solid black;
 }
 
 #screen {
@@ -27,15 +28,16 @@ main {
     display: flex;
     justify-content: space-between;
     height: 65px;
+    gap: 2px;
 }
 
 button {
     cursor: pointer;
     font-size: 25px;
-    width: 24.5%;
     border: none;
     background-color: #d8d9db;
-    margin-bottom: 0.5%
+    flex: 1;
+    margin-bottom: 0.5%;
 }
 
 button:hover {
@@ -60,9 +62,9 @@ button:last-child:active {
 }
 
 .half {
-    width: 49.5%;
+    flex-grow: 2.24;
 }
 
-.three-quarter {
-    width: 74.5%;
+.three-quarters {
+    flex-grow: 3.5;
 }
