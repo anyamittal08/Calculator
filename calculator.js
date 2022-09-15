@@ -5,57 +5,51 @@ const evaluateBtn = document.querySelector('.evaluate');
 const clearBtn = document.querySelector('.clear');
 const deleteBtn = document.querySelector('.delete');
 
-let displayVal = 0;
-let lastEvaluated = 0;
-let prevValEntered = 0;
-let currentOperator;
+let displayVal = null;
+let secondOperand = null;
+let lastEvaluated = null;
+let evaluated = false;
+let currentOperator = null;
 
-const addNums = (a, b) => (a+b);
-
-const subtractNums = (a, b) => (a-b);
-
-const multiplyNums = (a, b) => (a*b);
-
-const divideNums = (a, b) => (a/b);
-
-const operate = (operator, a, b) => {
+const evaluate = (operator, a, b) => {
     if (operator && a && b) {
         let result;
         let numA = parseInt(a);
         let numB = parseInt(b);
-        if (operator === '+') result = addNums(a, b);
-        else if (operator === '-') result = subtractNums(a, b);
-        else if (operator === 'x') result = multiplyNums(a, b);
-        else if (operator === '÷') result = divideNums(a, b);
+        if (operator === '+') result = numA+numB;
+        else if (operator === '-') result = numA-numB;
+        else if (operator === 'x') result = numA*numB;
+        else if (operator === '÷') result = numA/numB;
     
         screen.innerText = result;
         displayVal = result;
-        currentOperator = undefined;
+        currentOperator = null;
     }
 };
 
 const clear = () => {
-    screen.innerText = 0;
-    displayVal = 0;
-    prevValEntered = 0;
-    currentOperator = undefined;
+    screen.innerText = '0';
+    displayVal = null;
+    secondOperand = null;
+    lastEvaluated = null;
+    currentOperator = null;
+    evaluated = false;
 };
 
 const del = () => {
-    if (currentOperator === '=') return;
+    if (evaluated) return;
     if (screen.innerText.length === 1) {
-        screen.innerText = 0;
-        displayVal = 0;
+        screen.innerText = '0';
+        displayVal = null;
     } else {
         let newVal = screen.innerText.slice(0, screen.innerText.length - 1);
         screen.innerText = newVal;
         displayVal = parseInt(screen.innerText);
-        console.log(displayVal);
     }
 }
 for (let digit of digits) {
     digit.addEventListener('click', function() {
-        if (currentOperator === '=') return;
+        if (evaluated) return;
         if (screen.innerText === '0') screen.innerText = digit.innerText;
         else screen.innerText += digit.innerText;
         displayVal = parseInt(screen.innerText);
@@ -65,14 +59,24 @@ for (let digit of digits) {
 operatorsBtns.forEach(operator => {
     operator.addEventListener('click', () => {
         currentOperator = operator.innerText;
+        if (!lastEvaluated === null) {
+            lastEvaluated = evaluate(currentOperator, secondOperand, displayVal);
+            displayVal = lastEvaluated;
+            secondOperand = null;
+            currentOperator = null;
+
+        } else {
+            lastEvaluated 
+        }
+        secondOperand = displayVal;
         screen.innerText = '0';
-        prevValEntered = displayVal;
-        displayVal = 0;
+        displayVal = null;
+        evaluated = false;
     });  
 });
 
 evaluateBtn.addEventListener('click', () => {
-    operate(currentOperator, prevValEntered, displayVal);
+    evaluate(currentOperator, secondOperand, displayVal);
     currentOperator = '=';
 });
 
