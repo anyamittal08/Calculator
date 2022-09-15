@@ -1,85 +1,82 @@
 const screen = document.getElementById('screen');
-const digits = Array.from(document.querySelectorAll('.digit'));
-const operatorsBtns = Array.from(document.querySelectorAll('.operator'));
-const evaluateBtn = document.querySelector('.evaluate');
-const clearBtn = document.querySelector('.clear');
-const deleteBtn = document.querySelector('.delete');
+const buttons = document.querySelectorAll('button');
 
-let displayVal = null;
-let secondOperand = null;
-let lastEvaluated = null;
-let evaluated = false;
+let displayVal = '0';
+let runningTotal = null;
 let currentOperator = null;
+let evaluated = false;
 
-const evaluate = (operator, a, b) => {
-    if (operator && a && b) {
-        let result;
-        let numA = parseInt(a);
-        let numB = parseInt(b);
-        if (operator === '+') result = numA+numB;
-        else if (operator === '-') result = numA-numB;
-        else if (operator === 'x') result = numA*numB;
-        else if (operator === '÷') result = numA/numB;
-    
-        screen.innerText = result;
-        displayVal = result;
-        currentOperator = null;
+const handleClick = (val) => {
+    if (isNaN(parseInt(val))) {
+        handleSymbol(val);
     }
-};
+    else {
+        handleNumber(val);
+    }
+    updateDisplay();
+}
 
-const clear = () => {
-    screen.innerText = '0';
-    displayVal = null;
-    secondOperand = null;
-    lastEvaluated = null;
-    currentOperator = null;
-    evaluated = false;
-};
-
-const del = () => {
-    if (evaluated) return;
-    if (screen.innerText.length === 1) {
-        screen.innerText = '0';
-        displayVal = null;
-    } else {
-        let newVal = screen.innerText.slice(0, screen.innerText.length - 1);
-        screen.innerText = newVal;
-        displayVal = parseInt(screen.innerText);
+const handleNumber = (number) => {
+    if (!evaluated) {
+        if (displayVal === '0') displayVal = number;
+        else displayVal += number;
     }
 }
-for (let digit of digits) {
-    digit.addEventListener('click', function() {
-        if (evaluated) return;
-        if (screen.innerText === '0') screen.innerText = digit.innerText;
-        else screen.innerText += digit.innerText;
-        displayVal = parseInt(screen.innerText);
-    });
-};
 
-operatorsBtns.forEach(operator => {
-    operator.addEventListener('click', () => {
-        currentOperator = operator.innerText;
-        if (!lastEvaluated === null) {
-            lastEvaluated = evaluate(currentOperator, secondOperand, displayVal);
-            displayVal = lastEvaluated;
-            secondOperand = null;
+const handleSymbol = (val) => {
+    switch (val) {
+        case 'C':
+            displayVal = '0';
+            runningTotal = 0;
             currentOperator = null;
+            evaluated = false;
+            break;
+        case '←':
+            if (!evaluated) {
+                if (displayVal.length === 1) displayVal = '0';
+                else displayVal = displayVal.slice(0, displayVal.length - 1);
+            }
+            break;
+        case '=':
+            if (currentOperator === null) return;
+            operate(parseInt(displayVal));
+            displayVal = '' + runningTotal;
+            currentOperator = null;
+            evaluated = true;
+            break;
+        case '+':
+        case '-':
+        case 'x':
+        case '÷':
+            evaluate(val);
+            evaluated = false;
+            break;
+    }
+}
 
-        } else {
-            lastEvaluated 
-        }
-        secondOperand = displayVal;
-        screen.innerText = '0';
-        displayVal = null;
-        evaluated = false;
-    });  
+const updateDisplay = () => {
+    screen.innerText = displayVal;
+}
+
+const operate = (val) => {
+        if (currentOperator === '+') runningTotal += val;
+        else if (currentOperator === '-') runningTotal -= val;
+        else if (currentOperator === 'x') runningTotal *= val;
+        else if (currentOperator === '÷') runningTotal /= val;
+}
+
+const evaluate = (val) => {
+    if (runningTotal) {
+        operate(parseInt(displayVal));
+    } else {
+        runningTotal = parseInt(displayVal);
+    }
+    currentOperator = val;
+    displayVal = '0';
+}
+
+buttons.forEach(button => {
+    button.addEventListener('click', e => {
+        handleClick(e.target.innerText);
+    })
 });
-
-evaluateBtn.addEventListener('click', () => {
-    evaluate(currentOperator, secondOperand, displayVal);
-    currentOperator = '=';
-});
-
-clearBtn.addEventListener('click', clear);
-
-deleteBtn.addEventListener('click', del);
